@@ -1,17 +1,8 @@
 from rest_framework import serializers
 from .models import Person, Family, User
 from django.conf import settings
-from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSerializer
-from django.contrib.auth.forms import PasswordResetForm
-from dj_rest_auth.forms import AllAuthPasswordResetForm
-from django.urls import reverse
-from allauth.account.utils import (filter_users_by_email,
-                                    user_pk_to_url_str, user_username)
+from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSerializer, PasswordResetConfirmSerializer
 from .forms import MyCustomResetPasswordForm
-
-from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
-default_token_generator = EmailAwarePasswordResetTokenGenerator()
-
 
 
 class FamilySerializer(serializers.ModelSerializer):

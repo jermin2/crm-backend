@@ -205,4 +205,4 @@ EMAIL_HOST_PASSWORD = 'password'
 #     {'reset_password':contacts.serializers.ResetPasswordForm}
 # )
 
-ACCOUNT_FORMS = {'reset_password': 'contacts.forms.MyCustomResetPasswordForm'}
+ACCOUNT_FORMS = {'reset_password': 'contacts.forms.MyCustomResetPasswordForm',}
