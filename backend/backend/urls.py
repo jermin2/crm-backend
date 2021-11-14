@@ -18,6 +18,7 @@ from django.urls import path, include
 # from rest_framework import routers
 from contacts import views
 from contacts import routers
+from dj_rest_auth.registration.views import VerifyEmailView, ConfirmEmailView
 
 
 router = routers.CustomRouter()
@@ -27,5 +28,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/contacts-app/', include(router.urls)),
     path('api/auth/', include('dj_rest_auth.urls')),
+    path('api/auth/registration/account-confirm-email/<str:key>/', ConfirmEmailView.as_view()),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('api/auth/registration/account-confirm-email', VerifyEmailView.as_view(), name='account_email_verification_sent')
+
 ]
