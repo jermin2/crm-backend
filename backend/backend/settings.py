@@ -174,6 +174,7 @@ AUTH_USER_MODEL = 'contacts.User'
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'contacts.serializers.UserSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'contacts.serializers.PasswordResetSerializer',
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -191,6 +192,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_URL = env('LOGIN_URL')
+FRONTEND_URL = env('FRONTEND_URL')
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'emailhost'
@@ -198,3 +200,9 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'user'
 EMAIL_HOST_PASSWORD = 'password'
+
+# ACCOUNT_FORMS (
+#     {'reset_password':contacts.serializers.ResetPasswordForm}
+# )
+
+ACCOUNT_FORMS = {'reset_password': 'contacts.forms.MyCustomResetPasswordForm'}
