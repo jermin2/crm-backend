@@ -45,8 +45,8 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
 
-    ROLES = [('admin', 'Admin'), ('staff', 'Staff'), ('user', 'User'),('guest', 'Guest')]
-    role = models.CharField(max_length=5, choices=ROLES, default='guest')
+    ROLES = [('admin', 'Admin'), ('staff', 'Staff'), ('user', 'User'),('unverified', 'Unverified'),('guest', 'Guest')]
+    role = models.CharField(max_length=10, choices=ROLES, default='unverified')
 
     def __str__(self):
         return self.email
