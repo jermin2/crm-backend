@@ -1,0 +1,6 @@
+CREATE DATABASE churchdb;
+CREATE USER churchdb_user WITH PASSWORD '<password>';
+ALTER ROLE churchdb_user SET client_encoding TO 'utf8';
+ALTER ROLE churchdb_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE churchdb_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE helloworld TO <yourname>;
