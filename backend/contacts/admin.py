@@ -4,13 +4,13 @@ from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('id', 'first_name', 'last_name')
+    list_display = ('id', 'per_first_name', 'per_last_name')
 
 class PersonInline(admin.TabularInline):
     model = Person
 
 class FamilyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'family_name')
+    list_display = ('id', 'fam_family_name')
     inlines = [
         PersonInline,
     ]

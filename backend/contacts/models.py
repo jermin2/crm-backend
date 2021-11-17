@@ -56,7 +56,7 @@ class Person(models.Model):
     per_user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person")
     per_first_name = models.CharField( max_length=255)
     per_last_name = models.CharField( max_length=255, null=True, blank=True)
-    per_email = models.emailField(_('email address', null=True, blank=True))
+    per_email = models.EmailField(_('email address'), null=True, blank=True)
     per_day_of_birth = models.IntegerField(null=True, blank=True)
     per_month_of_birth = models.IntegerField(null=True, blank=True)
     per_year_of_birth = models.IntegerField(null=True, blank=True)
@@ -72,7 +72,7 @@ class Person(models.Model):
 class Family(models.Model):
     fam_family_name = models.CharField( max_length=255)
     fam_family_address = models.CharField( max_length=500, null=True, blank=True)
-    fam_family_email = models.emailField(_('email address', null=True, blank=True))
+    fam_family_email = models.EmailField(_('email address'), null=True, blank=True)
 
     def __str__(self):
         return str(self.id) + "|" + self.family_name.upper()
