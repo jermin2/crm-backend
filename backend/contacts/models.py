@@ -53,10 +53,14 @@ class User(AbstractUser):
 
 
 class Person(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person")
-    first_name = models.CharField( max_length=255)
-    last_name = models.CharField( max_length=255)
-    family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
+    per_user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person")
+    per_first_name = models.CharField( max_length=255)
+    per_last_name = models.CharField( max_length=255, null=True, blank=True)
+    per_email = models.emailField(_('email address', null=True, blank=True))
+    per_day_of_birth = models.IntegerField(null=True, blank=True)
+    per_month_of_birth = models.IntegerField(null=True, blank=True)
+    per_year_of_birth = models.IntegerField(null=True, blank=True)
+    per_family_id = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
 
     def __str__(self):
         return self.last_name.upper() + " " + self.first_name 
@@ -66,7 +70,9 @@ class Person(models.Model):
         return self.first_name.title() + " " + self.last_name.title()
 
 class Family(models.Model):
-    family_name = models.CharField( max_length=255)
+    fam_family_name = models.CharField( max_length=255)
+    fam_family_address = models.CharField( max_length=500, null=True, blank=True)
+    fam_family_email = models.emailField(_('email address', null=True, blank=True))
 
     def __str__(self):
         return str(self.id) + "|" + self.family_name.upper()
