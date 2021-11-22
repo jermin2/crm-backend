@@ -27,6 +27,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('role', 'admin')
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError(_('Superuser must have is_staff=True.'))
@@ -52,22 +53,29 @@ class User(AbstractUser):
         return self.email
 
 
+class FamilyRole(models.Model):
+    family_role = models.CharField( max_length=20 )
+
+    def __str__(self):
+        return self.family_role
+
 class Person(models.Model):
-    per_user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person", null=True, blank=True)
     per_first_name = models.CharField( max_length=255)
     per_last_name = models.CharField( max_length=255, null=True, blank=True)
     per_email = models.EmailField(_('email address'), null=True, blank=True)
     per_day_of_birth = models.IntegerField(null=True, blank=True)
     per_month_of_birth = models.IntegerField(null=True, blank=True)
     per_year_of_birth = models.IntegerField(null=True, blank=True)
-    per_family_id = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
+    per_family_role = models.ForeignKey(FamilyRole, on_delete=models.CASCADE, default=1)
+    family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
 
     def __str__(self):
-        return self.last_name.upper() + " " + self.first_name 
+        return self.per_last_name.upper() + " " + self.per_first_name 
 
     @property
     def displayName(self):
-        return self.first_name.title() + " " + self.last_name.title()
+        return self.per_first_name.title() + " " + self.per_last_name.title()
 
 class Family(models.Model):
     fam_family_name = models.CharField( max_length=255)
@@ -75,5 +83,5 @@ class Family(models.Model):
     fam_family_email = models.EmailField(_('email address'), null=True, blank=True)
 
     def __str__(self):
-        return str(self.id) + "|" + self.family_name.upper()
+        return str(self.id) + "|" + self.fam_family_name.upper()
 

@@ -4,18 +4,25 @@ from django.conf import settings
 from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSerializer, PasswordResetConfirmSerializer
 from .forms import MyCustomResetPasswordForm
 
+class FamilyMembersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ['per_first_name', 'per_last_name', 'per_family_role']
 
 class FamilySerializer(serializers.ModelSerializer):
+    family_members = FamilyMembersSerializer( many=True, required=False)
+
     class Meta:
         model = Family
         fields = '__all__'
 
 class PersonSerializer(serializers.ModelSerializer):
-    family = FamilySerializer()
+    family = FamilySerializer(read_only=True)
 
     class Meta:
         model = Person
         fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
     person = PersonSerializer()

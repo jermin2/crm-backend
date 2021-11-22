@@ -23,6 +23,7 @@ from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
 
 router = routers.CustomRouter()
 router.register('contact', views.PersonView)
+router.register('family', views.FamilyView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

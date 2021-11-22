@@ -1,5 +1,5 @@
 from django.contrib import admin
-from contacts.models import User, Person, Family
+from contacts.models import User, Person, Family, FamilyRole
 from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
@@ -23,3 +23,4 @@ class CustomUserAdmin(admin.ModelAdmin):
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(FamilyRole)
