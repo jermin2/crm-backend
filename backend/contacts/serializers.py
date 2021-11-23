@@ -26,6 +26,7 @@ class PersonSerializer(serializers.ModelSerializer):
     fam_email = serializers.CharField(required=False, allow_blank=True)
     set_school_year = serializers.IntegerField(required=False, allow_null=True)
     school_year = serializers.SerializerMethodField(required=False)
+    per_last_name = serializers.SerializerMethodField()
     age_group = serializers.SerializerMethodField()
 
     class Meta:
@@ -106,6 +107,12 @@ class PersonSerializer(serializers.ModelSerializer):
         if obj.per_year_one_year:
             return "To Be Implemented"
         return "Please set school / graduation year"
+
+    def get_per_last_name(self, obj):
+        if obj.per_last_name:
+            return obj.per_last_name
+        else :
+            return obj.family.fam_family_name
 
 
 
