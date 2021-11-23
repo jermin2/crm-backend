@@ -3,6 +3,7 @@ from .models import Person, Family, User
 from django.conf import settings
 from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSerializer, PasswordResetConfirmSerializer
 from .forms import MyCustomResetPasswordForm
+import datetime
 
 class FamilyMembersSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,9 +21,12 @@ class PersonSerializer(serializers.ModelSerializer):
     family = FamilySerializer(read_only=True)
     addFamily = serializers.BooleanField(required=False)
     existingFamily = serializers.IntegerField(required=False, allow_null=True)
-    fam_name = serializers.CharField(required=False)
-    fam_address = serializers.CharField(required=False)
-    fam_email = serializers.CharField(required=False)
+    fam_name = serializers.CharField(required=False, allow_blank=True)
+    fam_address = serializers.CharField(required=False, allow_blank=True)
+    fam_email = serializers.CharField(required=False, allow_blank=True)
+    set_school_year = serializers.IntegerField(required=False, allow_null=True)
+    school_year = serializers.SerializerMethodField(required=False)
+    age_group = serializers.SerializerMethodField()
 
     class Meta:
         model = Person
@@ -41,25 +45,37 @@ class PersonSerializer(serializers.ModelSerializer):
         if data.get('existingFamily') == '':
             data['existingFamily'] = None
 
+        if data.get('set_school_year') == '':
+            data['set_school_year'] = None
+
         return super(PersonSerializer, self).to_internal_value(data)
 
 
 
     def create(self, validated_data):
-
-        addFamily = validated_data.pop('addFamily')
-        existing = validated_data.pop('existingFamily')
+        print(validated_data)
 
         def valid_data(key, validated_data):
             if key in validated_data:
                 return validated_data.pop(key)
             else:
                 return None
-        # If we are adding a new family
-        if addFamily == True:
-            fam_family_name = valid_data('fam_name', validated_data)
-            fam_family_email = valid_data('fam_email', validated_data)
-            fam_family_address = valid_data('fam_address', validated_data)
+
+        schoolYear = valid_data('set_school_year', validated_data)
+        addFamily = valid_data('addFamily', validated_data)
+        existing = valid_data('existingFamily', validated_data)
+        fam_family_name = valid_data('fam_name', validated_data)
+        fam_family_email = valid_data('fam_email', validated_data)
+        fam_family_address = valid_data('fam_address', validated_data)
+
+
+        # Set correct year one
+        if schoolYear:
+            if schoolYear > 1000:
+                validated_data['per_year_one_year'] = schoolYear - 13
+            else:
+                validated_data['per_year_one_year'] = datetime.datetime.now().year - schoolYear
+            
             
         person = Person.objects.create(**validated_data)
 
@@ -76,6 +92,20 @@ class PersonSerializer(serializers.ModelSerializer):
             person.save()
 
         return person
+
+    def get_school_year(self, obj):
+        if obj.per_year_one_year:
+            school_year = datetime.datetime.now().year - obj.per_year_one_year
+            if school_year < 13 :
+                return (datetime.datetime.now().year - obj.per_year_one_year)
+            else:
+                return obj.per_year_one_year + 13
+        return None
+
+    def get_age_group(self, obj):
+        if obj.per_year_one_year:
+            return "To Be Implemented"
+        return "Please set school / graduation year"
 
 
 

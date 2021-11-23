@@ -67,6 +67,7 @@ class Person(models.Model):
     per_day_of_birth = models.IntegerField(null=True, blank=True)
     per_month_of_birth = models.IntegerField(null=True, blank=True)
     per_year_of_birth = models.IntegerField(null=True, blank=True)
+    per_year_one_year = models.IntegerField(null=True, blank=True)
     per_family_role = models.ForeignKey(FamilyRole, on_delete=models.CASCADE, default=1)
     family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
 
