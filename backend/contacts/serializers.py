@@ -6,9 +6,25 @@ from .forms import MyCustomResetPasswordForm
 import datetime
 
 class FamilyMembersSerializer(serializers.ModelSerializer):
+    family_role_text = serializers.SerializerMethodField(required=False)
+    per_last_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Person
-        fields = ['per_first_name', 'per_last_name', 'per_family_role']
+        fields = ['per_first_name', 'per_last_name', 'per_family_role', 'family_role_text']
+
+    
+    def get_family_role_text(self,obj):
+        if obj.per_family_role:
+            return obj.per_family_role.family_role
+        else :
+            return "Not set"
+
+    def get_per_last_name(self, obj):
+        if obj.per_last_name:
+            return obj.per_last_name
+        else :
+            return obj.family.fam_family_name
 
 class FamilySerializer(serializers.ModelSerializer):
     family_members = FamilyMembersSerializer( many=True, required=False)
@@ -26,6 +42,7 @@ class PersonSerializer(serializers.ModelSerializer):
     fam_email = serializers.CharField(required=False, allow_blank=True)
     set_school_year = serializers.IntegerField(required=False, allow_null=True)
     school_year = serializers.SerializerMethodField(required=False)
+
     per_last_name = serializers.SerializerMethodField()
     age_group = serializers.SerializerMethodField()
 
@@ -104,6 +121,7 @@ class PersonSerializer(serializers.ModelSerializer):
             return obj.per_last_name
         else :
             return obj.family.fam_family_name
+
 
 
 
