@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Person, Family, User
+from .models import Person, Family, User, FamilyRole
 from django.conf import settings
 from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSerializer, PasswordResetConfirmSerializer
 from .forms import MyCustomResetPasswordForm
@@ -34,15 +34,6 @@ class PersonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_internal_value(self, data):
-        if data.get('per_day_of_birth') == '':
-            data['per_day_of_birth'] = None
-
-        if data.get('per_month_of_birth') == '':
-            data['per_month_of_birth'] = None
-
-        if data.get('per_year_of_birth') == '':
-            data['per_year_of_birth'] = None
-
         if data.get('existingFamily') == '':
             data['existingFamily'] = None
 
@@ -131,3 +122,9 @@ class PasswordResetSerializer(_PasswordResetSerializer):
             raise serializers.ValidationError(self.reset_form.errors)
 
         return value
+
+class FamilyRoleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FamilyRole
+        fields = '__all__'
