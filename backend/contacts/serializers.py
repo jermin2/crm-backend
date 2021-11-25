@@ -27,11 +27,14 @@ class FamilyMembersSerializer(serializers.ModelSerializer):
             return obj.family.fam_family_name
 
 class FamilySerializer(serializers.ModelSerializer):
-    family_members = FamilyMembersSerializer( many=True, required=False)
+    family_members = FamilyMembersSerializer( many=True, required=False, read_only=True)
 
     class Meta:
         model = Family
         fields = '__all__'
+
+    # def update(self, instance, validated_data):
+    #     print(validated_data)
 
 class PersonSerializer(serializers.ModelSerializer):
     family = FamilySerializer(read_only=True)
@@ -59,11 +62,28 @@ class PersonSerializer(serializers.ModelSerializer):
 
         return super(PersonSerializer, self).to_internal_value(data)
 
+    def reverseSchoolYear(self, schoolYear):
+        if schoolYear > 1000:
+            return schoolYear - 13
+        else:
+            return datetime.datetime.now().year - schoolYear
+        
+    def update(self, instance, validated_data):
+        print(validated_data)
+        schoolYear = validated_data.pop('school_year')
+        # Set correct year one
+        if schoolYear:
+            validated_data['per_year_one_year'] = self.reverseSchoolYear (int(schoolYear))
+        validated_data.pop('existingFamily')
+        validated_data.pop('set_school_year')
+        validated_data.pop('age_group')
 
+        person = Person.objects.filter(id=instance.id).update(**validated_data)
+
+        return person
 
     def create(self, validated_data):
-        print(validated_data)
-
+        
         def valid_data(key, validated_data):
             if key in validated_data:
                 return validated_data.pop(key)
@@ -80,10 +100,8 @@ class PersonSerializer(serializers.ModelSerializer):
 
         # Set correct year one
         if schoolYear:
-            if schoolYear > 1000:
-                validated_data['per_year_one_year'] = schoolYear - 13
-            else:
-                validated_data['per_year_one_year'] = datetime.datetime.now().year - schoolYear
+            validated_data['per_year_one_year'] = reverseSchoolYear (schoolYear)
+
             
             
         person = Person.objects.create(**validated_data)
@@ -101,6 +119,7 @@ class PersonSerializer(serializers.ModelSerializer):
             person.save()
 
         return person
+
 
     def get_school_year(self, obj):
         if obj.per_year_one_year:

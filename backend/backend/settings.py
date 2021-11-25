@@ -216,3 +216,5 @@ ACCOUNT_FORMS = {'reset_password': 'contacts.forms.MyCustomResetPasswordForm',}
 SIMPLE_JWT = {
 'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
 }
+
+APPEND_SLASH=False

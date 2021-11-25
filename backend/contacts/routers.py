@@ -15,8 +15,15 @@ class CustomRouter(DefaultRouter):
         Route(
             url=r'^add-{prefix}$',
             mapping={'post':'create'},
-            name='{basename}-list',
+            name='{basename}-create',
             detail=False,
-            initkwargs={'suffix':'List'}
+            initkwargs={'suffix':'Detail'}
         ),
+        Route(
+            url=r'^update-{prefix}/{lookup}$',
+            mapping={'put':'update'},
+            name='{basename}-update',
+            detail=True,
+            initkwargs={'suffix':'Detail'}
+        )
     ]
