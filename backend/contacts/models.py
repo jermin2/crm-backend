@@ -64,7 +64,7 @@ class Person(models.Model):
     per_first_name = models.CharField( max_length=255)
     per_last_name = models.CharField( max_length=255, default='', blank=True)
     per_phone = models.CharField( max_length=20, default='', blank=True)
-    per_email = models.EmailField(_('email address'), null=True, blank=True)
+    per_email = models.EmailField(_('email address'), default='', blank=True)
     per_birthday = models.DateField(null=True, blank=True)
     per_year_one_year = models.IntegerField(null=True, blank=True)
     per_family_role = models.ForeignKey(FamilyRole, on_delete=models.CASCADE, default=1)
@@ -79,8 +79,8 @@ class Person(models.Model):
 
 class Family(models.Model):
     fam_family_name = models.CharField( max_length=255)
-    fam_family_address = models.CharField( max_length=500, null=True, blank=True)
-    fam_family_email = models.EmailField(_('email address'), null=True, blank=True)
+    fam_family_address = models.CharField( max_length=500, default='', blank=True)
+    fam_family_email = models.EmailField(_('email address'), default='', blank=True)
 
     def __str__(self):
         return str(self.id) + "|" + self.fam_family_name.upper()
