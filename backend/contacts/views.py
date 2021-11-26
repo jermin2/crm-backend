@@ -19,9 +19,8 @@ class PersonView(viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAuthenticated]
     queryset = Person.objects.all()
 
-    # def perform_create(self, serializer):
-    #     print(self.request.data)
-    #     serializer.save(person=self.request.data)
+    def perform_create(self, serializer):
+        serializer.save()
 
     # def update(self, request, pk=None):
     #     print(self.request.data)

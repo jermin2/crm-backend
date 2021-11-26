@@ -28,22 +28,37 @@ class FamilyMembersSerializer(serializers.ModelSerializer):
 
 class FamilySerializer(serializers.ModelSerializer):
     family_members = FamilyMembersSerializer( many=True, required=False, read_only=True)
+    family_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Family
-        fields = '__all__'
+        fields = ['id', 'family_id', 'fam_family_name', 'fam_family_email', 'fam_family_address', 'family_members']
+
+    def to_internal_value(self, data):
+        #use existing family
+        if data['addFamily'] == "false": 
+            try:
+                obj_id = data['id']
+                return Family.objects.get(id=obj_id)
+            except KeyError:
+                raise serializers.ValidationError(
+                    'id is a required field.'
+                )
+            except ValueError:
+                raise serializers.ValidationError(
+                    'id must be an integer.'
+                )
+        else:
+            # Create new family
+            family_data = super(FamilySerializer, self).to_internal_value(data)
+            return Family.objects.create(**family_data)
+
 
     # def update(self, instance, validated_data):
     #     print(validated_data)
 
 class PersonSerializer(serializers.ModelSerializer):
-    family = FamilySerializer(read_only=True)
-    addFamily = serializers.BooleanField(required=False)
-    existingFamily = serializers.IntegerField(required=False, allow_null=True)
-    fam_name = serializers.CharField(required=False, allow_blank=True)
-    fam_address = serializers.CharField(required=False, allow_blank=True)
-    fam_email = serializers.CharField(required=False, allow_blank=True)
-    set_school_year = serializers.IntegerField(required=False, allow_null=True)
+    family = FamilySerializer(required=False)
     school_year = serializers.SerializerMethodField(required=False)
 
     per_last_name = serializers.SerializerMethodField()
@@ -54,11 +69,12 @@ class PersonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_internal_value(self, data):
-        if data.get('existingFamily') == '':
-            data['existingFamily'] = None
 
-        if data.get('set_school_year') == '':
-            data['set_school_year'] = None
+        # Convert school year to per_year_one_year
+        if data.get('school_year') == '':
+            data['school_year'] = None
+        else:
+            data['per_year_one_year'] = self.reverseSchoolYear( int(data.get('school_year')) )
 
         return super(PersonSerializer, self).to_internal_value(data)
 
@@ -68,56 +84,22 @@ class PersonSerializer(serializers.ModelSerializer):
         else:
             return datetime.datetime.now().year - schoolYear
         
-    def update(self, instance, validated_data):
-        print(validated_data)
-        schoolYear = validated_data.pop('school_year')
-        # Set correct year one
-        if schoolYear:
-            validated_data['per_year_one_year'] = self.reverseSchoolYear (int(schoolYear))
-        validated_data.pop('existingFamily')
-        validated_data.pop('set_school_year')
-        validated_data.pop('age_group')
+    # def update(self, instance, validated_data):
+    #     print(validated_data)
+    #     schoolYear = validated_data.pop('school_year')
+    #     # Set correct year one
+    #     if schoolYear:
+    #         validated_data['per_year_one_year'] = self.reverseSchoolYear (int(schoolYear))
+    #     validated_data.pop('existingFamily')
+    #     validated_data.pop('set_school_year')
+    #     validated_data.pop('age_group')
 
-        person = Person.objects.filter(id=instance.id).update(**validated_data)
+    #     person = Person.objects.filter(id=instance.id).update(**validated_data)
 
-        return person
+    #     return person
 
     def create(self, validated_data):
-        
-        def valid_data(key, validated_data):
-            if key in validated_data:
-                return validated_data.pop(key)
-            else:
-                return None
-
-        schoolYear = valid_data('set_school_year', validated_data)
-        addFamily = valid_data('addFamily', validated_data)
-        existing = valid_data('existingFamily', validated_data)
-        fam_family_name = valid_data('fam_name', validated_data)
-        fam_family_email = valid_data('fam_email', validated_data)
-        fam_family_address = valid_data('fam_address', validated_data)
-
-
-        # Set correct year one
-        if schoolYear:
-            validated_data['per_year_one_year'] = reverseSchoolYear (schoolYear)
-
-            
-            
         person = Person.objects.create(**validated_data)
-
-        if not addFamily:
-            person.family = Family.objects.get(id=existing)
-            person.save()
-        else:
-            fam = Family.objects.create(
-                fam_family_name=fam_family_name,
-                fam_family_email=fam_family_email,
-                fam_family_address=fam_family_address
-            )
-            person.family = fam
-            person.save()
-
         return person
 
 
@@ -135,13 +117,12 @@ class PersonSerializer(serializers.ModelSerializer):
             return "To Be Implemented"
         return "Please set school / graduation year"
 
+    # Return family last name, if none is entered
     def get_per_last_name(self, obj):
         if obj.per_last_name:
             return obj.per_last_name
         else :
             return obj.family.fam_family_name
-
-
 
 
 class UserSerializer(serializers.ModelSerializer):
