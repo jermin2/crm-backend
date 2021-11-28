@@ -61,27 +61,27 @@ class FamilyRole(models.Model):
 
 class Person(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person", null=True, blank=True)
-    per_first_name = models.CharField( max_length=255)
-    per_last_name = models.CharField( max_length=255, default='', blank=True)
+    per_firstName = models.CharField( max_length=255)
+    per_lastName = models.CharField( max_length=255, default='', blank=True)
     per_phone = models.CharField( max_length=20, default='', blank=True)
     per_email = models.EmailField(_('email address'), default='', blank=True)
     per_birthday = models.DateField(null=True, blank=True)
-    per_year_one_year = models.IntegerField(null=True, blank=True)
-    per_family_role = models.ForeignKey(FamilyRole, on_delete=models.CASCADE, default=1)
+    per_yearOneYear = models.IntegerField(null=True, blank=True)
+    per_familyRole = models.ForeignKey(FamilyRole, on_delete=models.CASCADE, default=1)
     family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
 
     def __str__(self):
-        return self.per_last_name.upper() + " " + self.per_first_name 
+        return self.per_lastName.upper() + " " + self.per_firstName 
 
     @property
     def displayName(self):
-        return self.per_first_name.title() + " " + self.per_last_name.title()
+        return self.per_firstName.title() + " " + self.per_lastName.title()
 
 class Family(models.Model):
-    fam_family_name = models.CharField( max_length=255)
-    fam_family_address = models.CharField( max_length=500, default='', blank=True)
-    fam_family_email = models.EmailField(_('email address'), default='', blank=True)
+    fam_familyName = models.CharField( max_length=255)
+    fam_familyAddress = models.CharField( max_length=500, default='', blank=True)
+    fam_familyEmail = models.EmailField(_('email address'), default='', blank=True)
 
     def __str__(self):
-        return str(self.id) + "|" + self.fam_family_name.upper()
+        return str(self.id) + "|" + self.fam_familyName.upper()
 
