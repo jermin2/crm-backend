@@ -16,8 +16,8 @@ class FamilyView(viewsets.ModelViewSet):
 # Create your views here.
 class PersonView(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
-    # permission_classes = [permissions.IsAuthenticated]
     queryset = Person.objects.all()
+    # permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save()

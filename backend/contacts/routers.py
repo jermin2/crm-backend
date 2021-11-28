@@ -25,5 +25,13 @@ class CustomRouter(DefaultRouter):
             name='{basename}-update',
             detail=True,
             initkwargs={'suffix':'Detail'}
-        )
+        ),
+        Route(
+            url=r'^remove{prefix}/{lookup}$',
+            mapping={'delete':'destroy'},
+            name='{basename}-detail',
+            detail=False,
+            initkwargs={'suffix':'Detail'}
+        ),
+
     ]
