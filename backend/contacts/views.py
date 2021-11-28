@@ -11,12 +11,12 @@ from django.dispatch import receiver
 
 class FamilyView(viewsets.ModelViewSet):
     serializer_class = FamilySerializer
-    queryset = Family.objects.all()
+    queryset = Family.objects.all().order_by('fam_family_name')
 
 # Create your views here.
 class PersonView(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
-    queryset = Person.objects.all()
+    queryset = Person.objects.all().order_by('per_first_name')
     # permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):

@@ -33,7 +33,7 @@ class FamilySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Family
-        fields = ['id', 'family_id', 'fam_family_name', 'fam_family_email', 'fam_family_address', 'family_members', 'action']
+        fields = ['fam_family_name','id', 'family_id',  'fam_family_email', 'fam_family_address', 'family_members', 'action']
 
     def to_internal_value(self, data):
         print("to internval family: ", data)
@@ -57,30 +57,6 @@ class FamilySerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'id must be an integer.'
                 )
-
-# class SchoolYearField(serializers.Field):
-#     """
-#     School Year Field representing either their current year, or the year of their HS graudation
-#     """
-#     def to_representation(self, obj):
-#         if obj.per_year_one_year:
-#             school_year = datetime.datetime.now().year - obj.per_year_one_year
-#             if school_year < 13 :
-#                 return (datetime.datetime.now().year - obj.per_year_one_year)
-#             else:
-#                 return obj.per_year_one_year + 13
-#         return ''
-
-
-#     def to_internal_value(self, data):
-#         if data == None or data == "":
-#             return data
-#         else:
-#             schoolYear = int(data)
-#             if schoolYear > 1000:
-#                 return {'per_year_one_year': '2002'} #schoolYear - 13
-#             else:
-#                 return {'per_year_one_year': '2004'} #datetime.datetime.now().year - schoolYear
 
 class LastNameField(serializers.Field):
     def to_representation(self, obj):
