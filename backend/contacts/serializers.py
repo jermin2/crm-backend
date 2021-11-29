@@ -11,7 +11,7 @@ class FamilyMembersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = ['per_firstName', 'per_lastName', 'per_familyRole', 'family_role_text']
+        fields = ['per_familyRole', 'per_firstName', 'per_lastName', 'id', 'family_role_text']
 
     
     def get_family_role_text(self,obj):
