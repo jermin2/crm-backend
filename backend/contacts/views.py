@@ -13,6 +13,9 @@ class FamilyView(viewsets.ModelViewSet):
     serializer_class = FamilySerializer
     queryset = Family.objects.all().order_by('fam_familyName')
 
+    def perform_update(self, serializer):
+        serializer.save()
+
 # Create your views here.
 class PersonView(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
@@ -24,6 +27,10 @@ class PersonView(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save()
+
+# class PersonListView(viewsets.ModelViewSet):
+#     serializer_class = PersonListSerializer
+#     queryset = Person.objects.all().order_by('per_firstName')
 
 class FamilyRoleView(viewsets.ModelViewSet):
     serializer_class = FamilyRoleSerializer

@@ -21,7 +21,7 @@ from contacts import routers
 from dj_rest_auth.registration.views import VerifyEmailView
 from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
 
-router = routers.CustomRouter()
+router = routers.DefaultRouter()
 router.register('contact', views.PersonView)
 router.register('family', views.FamilyView)
 router.register('familyRole', views.FamilyRoleView)
