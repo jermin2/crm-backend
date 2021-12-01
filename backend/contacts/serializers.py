@@ -5,8 +5,14 @@ from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSe
 from .forms import MyCustomResetPasswordForm
 import datetime
 
+class FamilyRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FamilyRole
+        fields = '__all__'
+
 class FamilyMembersSerializer(serializers.ModelSerializer):
     family_role_text = serializers.SerializerMethodField(required=False)
+    # family_role = serializers.IntegerField(source='per_familyRole.id', required=False)
     per_lastName = serializers.SerializerMethodField()
     person_id = serializers.IntegerField(source='id')
 
@@ -181,8 +187,3 @@ class PasswordResetSerializer(_PasswordResetSerializer):
 
         return value
 
-class FamilyRoleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = FamilyRole
-        fields = '__all__'
