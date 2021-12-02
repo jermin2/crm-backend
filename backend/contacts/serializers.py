@@ -5,6 +5,12 @@ from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSe
 from .forms import MyCustomResetPasswordForm
 import datetime
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
 class FamilyRoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = FamilyRole
@@ -18,7 +24,7 @@ class FamilyMembersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = ['per_familyRole', 'per_firstName', 'per_lastName', 'id', 'person_id', 'family_role_text']
+        fields = ['per_familyRole', 'per_firstName', 'per_lastName', 'id', 'person_id', 'family_role_text', 'per_avatar']
 
     
     def get_family_role_text(self,obj):
@@ -54,7 +60,6 @@ class FamilySerializer(serializers.ModelSerializer):
         fields = ['fam_familyName','id', 'family_id',  'fam_familyEmail', 'fam_familyAddress', 'family_members']
 
     def update(self, instance, validated_data):
-        print("update", validated_data)
         family_members = validated_data.pop('family_members')
         for person in family_members:
             # Assume we have people object by this stage
@@ -92,7 +97,6 @@ class PersonFamilySerializer(FamilySerializer):
         fields = ['fam_familyName','id', 'family_id',  'fam_familyEmail', 'fam_familyAddress', 'family_members', 'action']
 
     def to_internal_value(self, data):
-        print("to internval family: ", data)
         action = data.pop('action')
 
         if action == 'fetch':
@@ -109,7 +113,6 @@ class PersonFamilySerializer(FamilySerializer):
                 family_data = super(PersonFamilySerializer, self).to_internal_value(data)
                 Family.objects.filter(id=obj_id).update(**family_data)
                 # print("family_data: ", family_data)
-                print("to internval family 2: ", data)
                 return Family.objects.get(id=obj_id)
 
         except KeyError:
@@ -126,7 +129,7 @@ class PersonSerializer(serializers.ModelSerializer):
     school_year = serializers.SerializerMethodField(required=False)
     per_birthday = BirthdayField(source='*', allow_null=True)
     per_lastName = LastNameField(source='*', required=False)
-    age_group = serializers.SerializerMethodField()
+    ageGroup = serializers.SerializerMethodField()
     family = PersonFamilySerializer(required=False)
 
     class Meta:
@@ -171,10 +174,19 @@ class PersonSerializer(serializers.ModelSerializer):
                 return obj.per_yearOneYear + 13
         return ''
 
-    def get_age_group(self, obj):
+    def get_ageGroup(self, obj):
         if obj.per_yearOneYear:
-            return "To Be Implemented"
-        return "Please set school / graduation year"
+            year = datetime.datetime.now().year - int(obj.per_yearOneYear)
+            if year <= 6:
+                return "Primary"
+            if year <= 8:
+                return "Intermediate"
+            if year <= 13:
+                return "Highschooler"
+            if year <= 25:
+                return "Young Person"
+            return "Adult"
+        return "-"
 
 class UserSerializer(serializers.ModelSerializer):
     person = PersonSerializer()

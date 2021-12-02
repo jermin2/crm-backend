@@ -43,7 +43,8 @@ urlpatterns = [
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/account-confirm-email/<str:key>/', views.CustomConfirmEmailView.as_view()),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('api/auth/registration/account-confirm-email', VerifyEmailView.as_view(), name='account_email_verification_sent')
+    path('api/auth/registration/account-confirm-email', VerifyEmailView.as_view(), name='account_email_verification_sent'),
+    path('api/contacts-app/user/', views.get_user, name='user'),
 
 ]
 

@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from .serializers import PersonSerializer, FamilySerializer, FamilyRoleSerializer, AvatarSerializer
+from .serializers import PersonSerializer, FamilySerializer, FamilyRoleSerializer, AvatarSerializer, UserSerializer
 from rest_framework import viewsets, permissions
 from django.http import JsonResponse
-from .models import Person, Family, FamilyRole, Avatar
+from .models import Person, Family, FamilyRole, Avatar, User
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 from dj_rest_auth.registration.views import ConfirmEmailView
 
@@ -51,3 +52,15 @@ class AvatarView(viewsets.ModelViewSet):
 class CustomConfirmEmailView(ConfirmEmailView):
    pass
 
+
+# @authentication_classes([SessionAuthentication, BasicAuthentication])
+# @permission_classes([IsAuthenticated])
+@api_view(['GET', 'PUT'])
+def get_user(request):  
+
+    if request.user.is_anonymous:
+        return JsonResponse({"data":"anonymouse user"}, status=401)
+
+    print(request.user)
+    serializer = UserSerializer(request.user)
+    return JsonResponse({"data":serializer.data}, status=200)

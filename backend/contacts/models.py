@@ -73,6 +73,7 @@ class Person(models.Model):
     per_familyRole = models.ForeignKey(FamilyRole, on_delete=models.CASCADE, default=1)
     family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
     per_avatar = models.CharField( max_length=255, default='', blank=True)
+    per_notes = models.TextField(default='', blank=True)
 
     def __str__(self):
         return self.per_lastName.upper() + " " + self.per_firstName 
