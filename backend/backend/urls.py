@@ -21,10 +21,17 @@ from contacts import routers
 from dj_rest_auth.registration.views import VerifyEmailView
 from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
 
+from django.conf import settings
+from django.conf.urls.static import static
+
+
+
+
 router = routers.DefaultRouter()
 router.register('contact', views.PersonView)
 router.register('family', views.FamilyView)
 router.register('familyRole', views.FamilyRoleView)
+router.register('avatar', views.AvatarView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,3 +46,7 @@ urlpatterns = [
     path('api/auth/registration/account-confirm-email', VerifyEmailView.as_view(), name='account_email_verification_sent')
 
 ]
+
+if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL,
+                              document_root=settings.MEDIA_ROOT)

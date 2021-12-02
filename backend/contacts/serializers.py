@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Person, Family, User, FamilyRole
+from .models import Person, Family, User, FamilyRole, Avatar
 from django.conf import settings
 from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSerializer, PasswordResetConfirmSerializer
 from .forms import MyCustomResetPasswordForm
@@ -92,7 +92,7 @@ class PersonFamilySerializer(FamilySerializer):
         fields = ['fam_familyName','id', 'family_id',  'fam_familyEmail', 'fam_familyAddress', 'family_members', 'action']
 
     def to_internal_value(self, data):
-        # print("to internval family: ", data)
+        print("to internval family: ", data)
         action = data.pop('action')
 
         if action == 'fetch':
@@ -104,10 +104,12 @@ class PersonFamilySerializer(FamilySerializer):
                 family_data = super(PersonFamilySerializer, self).to_internal_value(data['new'])
                 return Family.objects.create(**family_data)
             if action == 'update':
+                print("update")
                 obj_id = data['id']
                 family_data = super(PersonFamilySerializer, self).to_internal_value(data)
                 Family.objects.filter(id=obj_id).update(**family_data)
                 # print("family_data: ", family_data)
+                print("to internval family 2: ", data)
                 return Family.objects.get(id=obj_id)
 
         except KeyError:
@@ -123,7 +125,7 @@ class PersonFamilySerializer(FamilySerializer):
 class PersonSerializer(serializers.ModelSerializer):
     school_year = serializers.SerializerMethodField(required=False)
     per_birthday = BirthdayField(source='*', allow_null=True)
-    per_lastName = LastNameField(source='*')
+    per_lastName = LastNameField(source='*', required=False)
     age_group = serializers.SerializerMethodField()
     family = PersonFamilySerializer(required=False)
 
@@ -132,16 +134,19 @@ class PersonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_internal_value(self, data):
+        data_copy = data.copy()
         # Convert school year to per_yearOneYear
         if data.get('school_year') == None or data.get('school_year') == "":
-            data['school_year'] = None
+            data_copy['school_year'] = None
         else:
-            data['per_yearOneYear'] = self.reverseSchoolYear( int(data.get('school_year')) )
+            data_copy['per_yearOneYear'] = self.reverseSchoolYear( int(data.get('school_year')) )
 
         if data.get('per_birthday') == None or data.get('per_birthday') == "":
-            data['per_birthday'] = None
+            data_copy['per_birthday'] = None
 
-        return super(PersonSerializer, self).to_internal_value(data)
+        validated =  super(PersonSerializer, self).to_internal_value(data_copy)
+
+        return validated
 
     def reverseSchoolYear(self, schoolYear):
         if schoolYear > 1000:
@@ -187,3 +192,7 @@ class PasswordResetSerializer(_PasswordResetSerializer):
 
         return value
 
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Avatar
+        fields = '__all__'

@@ -59,6 +59,9 @@ class FamilyRole(models.Model):
     def __str__(self):
         return self.family_role
 
+class Avatar(models.Model):
+    avatar = models.ImageField(upload_to='images/' )
+
 class Person(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person", null=True, blank=True)
     per_firstName = models.CharField( max_length=255)
@@ -69,6 +72,7 @@ class Person(models.Model):
     per_yearOneYear = models.IntegerField(null=True, blank=True)
     per_familyRole = models.ForeignKey(FamilyRole, on_delete=models.CASCADE, default=1)
     family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
+    per_avatar = models.CharField( max_length=255, default='', blank=True)
 
     def __str__(self):
         return self.per_lastName.upper() + " " + self.per_firstName 

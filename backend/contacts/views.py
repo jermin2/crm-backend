@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .serializers import PersonSerializer, FamilySerializer, FamilyRoleSerializer
+from .serializers import PersonSerializer, FamilySerializer, FamilyRoleSerializer, AvatarSerializer
 from rest_framework import viewsets, permissions
 from django.http import JsonResponse
-from .models import Person, Family, FamilyRole
+from .models import Person, Family, FamilyRole, Avatar
 
 from dj_rest_auth.registration.views import ConfirmEmailView
 
@@ -26,6 +26,7 @@ class PersonView(viewsets.ModelViewSet):
         serializer.save()
 
     def perform_update(self, serializer):
+        print(self.request.data)
         serializer.save()
 
 # class PersonListView(viewsets.ModelViewSet):
@@ -43,7 +44,9 @@ def email_confirmed_(request, email_address, **kwargs):
     print("email confirmed")
     user.save()
 
-
+class AvatarView(viewsets.ModelViewSet):
+    serializer_class = AvatarSerializer
+    queryset = Avatar.objects.all()
 
 class CustomConfirmEmailView(ConfirmEmailView):
    pass
