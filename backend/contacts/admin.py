@@ -1,5 +1,5 @@
 from django.contrib import admin
-from contacts.models import User, Person, Family, FamilyRole
+from contacts.models import User, Person, Family, FamilyRole, Tag
 from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
@@ -24,3 +24,4 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(FamilyRole)
+admin.site.register(Tag)

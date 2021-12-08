@@ -1,14 +1,31 @@
 from django.shortcuts import render
-from .serializers import PersonSerializer, FamilySerializer, FamilyRoleSerializer, AvatarSerializer, UserSerializer
+from .serializers import PersonSerializer, FamilySerializer, FamilyRoleSerializer, AvatarSerializer, UserSerializer, PersonTagSerializer, UserTagSerializer
 from rest_framework import viewsets, permissions
 from django.http import JsonResponse
-from .models import Person, Family, FamilyRole, Avatar, User
+from .models import Person, Family, FamilyRole, Avatar, User, Tag
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 from dj_rest_auth.registration.views import ConfirmEmailView
 
 from allauth.account.signals import email_confirmed
 from django.dispatch import receiver
+
+from rest_framework import generics
+
+class TagView(viewsets.ModelViewSet):
+    serializer_class = UserTagSerializer
+
+    def get_queryset(self):
+        """
+        This view should return a list of tags
+        for the currently authenticated user.
+        """
+        user = self.request.user
+        if user.is_anonymous:
+            print("anonymouse user detected")
+            return Tag.objects.all() # TODO - remove this line
+        return Tag.objects.filter(user=user)
+
 
 class FamilyView(viewsets.ModelViewSet):
     serializer_class = FamilySerializer
@@ -21,6 +38,7 @@ class FamilyView(viewsets.ModelViewSet):
 class PersonView(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
     queryset = Person.objects.all().order_by('per_firstName')
+
     # permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -30,9 +48,15 @@ class PersonView(viewsets.ModelViewSet):
         print(self.request.data)
         serializer.save()
 
-# class PersonListView(viewsets.ModelViewSet):
-#     serializer_class = PersonListSerializer
-#     queryset = Person.objects.all().order_by('per_firstName')
+class UserView(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+        Tag.objects.create(color='#ff0000', description='red', user=self)
+        Tag.objects.create(color='#00ff00', description='green', user=self)
+        Tag.objects.create(color='#0000ff', description='blue', user=self)
 
 class FamilyRoleView(viewsets.ModelViewSet):
     serializer_class = FamilyRoleSerializer

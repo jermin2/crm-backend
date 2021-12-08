@@ -90,3 +90,12 @@ class Family(models.Model):
     def __str__(self):
         return str(self.id) + "|" + self.fam_familyName.upper()
 
+class Tag(models.Model):
+    tag_id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tags")
+    color = models.CharField( max_length=10, default='#ffffff', blank=True)
+    description = models.CharField( max_length=255, default='', blank=True)
+    person = models.ManyToManyField(Person, related_name="tags")
+
+    def __str__(self):
+        return self.user.email + " | " + str(self.tag_id)

@@ -32,6 +32,8 @@ router.register('contact', views.PersonView)
 router.register('family', views.FamilyView)
 router.register('familyRole', views.FamilyRoleView)
 router.register('avatar', views.AvatarView)
+router.register('user', views.UserView)
+router.register('tag', views.TagView, 'tag-detail')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

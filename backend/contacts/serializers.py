@@ -1,15 +1,10 @@
 from rest_framework import serializers
-from .models import Person, Family, User, FamilyRole, Avatar
+from .models import Person, Family, User, FamilyRole, Avatar, Tag
 from django.conf import settings
 from dj_rest_auth.serializers import PasswordResetSerializer as _PasswordResetSerializer, PasswordResetConfirmSerializer
 from .forms import MyCustomResetPasswordForm
+from rest_framework import generics
 import datetime
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = '__all__'
-
 
 class FamilyRoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -124,6 +119,29 @@ class PersonFamilySerializer(FamilySerializer):
                 'id must be an integer.'
             )
 
+class UserTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['tag_id', 'color', 'description', 'user']
+
+class FilteredListSerializer(serializers.ListSerializer):
+
+    def to_representation(self, data):
+        print(self.context['request'].user)
+        user = self.context['request'].user
+        if user.is_anonymous:
+            return super(FilteredListSerializer, self).to_representation(data)
+        data = data.filter(user=self.context['request'].user)
+        return super(FilteredListSerializer, self).to_representation(data)
+
+
+class PersonTagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tag
+        list_serializer_class = FilteredListSerializer
+        fields = ['tag_id', 'color', 'description']
+
 
 class PersonSerializer(serializers.ModelSerializer):
     school_year = serializers.SerializerMethodField(required=False)
@@ -131,6 +149,7 @@ class PersonSerializer(serializers.ModelSerializer):
     per_lastName = LastNameField(source='*', required=False)
     ageGroup = serializers.SerializerMethodField()
     family = PersonFamilySerializer(required=False)
+    tags = PersonTagSerializer(many=True)
 
     class Meta:
         model = Person
@@ -190,10 +209,11 @@ class PersonSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     person = PersonSerializer()
+    tags = PersonTagSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ['id','email', 'role', 'user_permissions', 'person']
+        fields = ['id','email', 'role', 'user_permissions', 'person', 'tags']
 
 class PasswordResetSerializer(_PasswordResetSerializer):
     def validate_email(self, value):
