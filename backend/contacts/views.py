@@ -11,6 +11,7 @@ from allauth.account.signals import email_confirmed
 from django.dispatch import receiver
 
 from rest_framework import generics
+from rest_framework.mixins import UpdateModelMixin
 
 class TagView(viewsets.ModelViewSet):
     serializer_class = UserTagSerializer
@@ -75,6 +76,33 @@ class AvatarView(viewsets.ModelViewSet):
 
 class CustomConfirmEmailView(ConfirmEmailView):
    pass
+
+class PersonTagUpdateView(viewsets.ModelViewSet):
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+
+
+@api_view(['PUT','PATCH'])
+def update_person_tags(request, id):
+    # if request.user.is_anonymous:
+    #     print("anon")
+    #     return JsonResponse({"data":"anonymouse user"}, status=401)
+
+    person = Person.objects.filter(id = id).first()
+
+    tag_id = request.data['tag_id']
+
+    tagData = Tag.objects.filter(tag_id = tag_id).first()
+    message = ""
+    if person.tags.filter(tag_id = tag_id).exists():
+        person.tags.remove(tagData)
+        message = "Removed"
+    else:
+        person.tags.add(tagData)
+        message = "Added"
+    person.save()
+
+    return JsonResponse({"data":message}, status=200)
 
 
 # @authentication_classes([SessionAuthentication, BasicAuthentication])

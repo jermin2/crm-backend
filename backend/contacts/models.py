@@ -62,6 +62,16 @@ class FamilyRole(models.Model):
 class Avatar(models.Model):
     avatar = models.ImageField(upload_to='images/' )
 
+class Tag(models.Model):
+    tag_id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tags")
+    color = models.CharField( max_length=10, default='#ffffff', blank=True)
+    description = models.CharField( max_length=255, default='', blank=True)
+
+    def __str__(self):
+        return self.user.email + " | " + str(self.tag_id)
+
+
 class Person(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="person", null=True, blank=True)
     per_firstName = models.CharField( max_length=255)
@@ -74,6 +84,7 @@ class Person(models.Model):
     family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
     per_avatar = models.CharField( max_length=255, default='', blank=True)
     per_notes = models.TextField(default='', blank=True)
+    tags = models.ManyToManyField(Tag, related_name="persons")
 
     def __str__(self):
         return self.per_lastName.upper() + " " + self.per_firstName 
@@ -90,12 +101,3 @@ class Family(models.Model):
     def __str__(self):
         return str(self.id) + "|" + self.fam_familyName.upper()
 
-class Tag(models.Model):
-    tag_id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tags")
-    color = models.CharField( max_length=10, default='#ffffff', blank=True)
-    description = models.CharField( max_length=255, default='', blank=True)
-    person = models.ManyToManyField(Person, related_name="tags")
-
-    def __str__(self):
-        return self.user.email + " | " + str(self.tag_id)

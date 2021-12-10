@@ -127,9 +127,8 @@ class UserTagSerializer(serializers.ModelSerializer):
 class FilteredListSerializer(serializers.ListSerializer):
 
     def to_representation(self, data):
-        print(self.context['request'].user)
         user = self.context['request'].user
-        if user.is_anonymous:
+        if user.is_anonymous: # TODO Return nothing if anonymouse
             return super(FilteredListSerializer, self).to_representation(data)
         data = data.filter(user=self.context['request'].user)
         return super(FilteredListSerializer, self).to_representation(data)
@@ -149,7 +148,7 @@ class PersonSerializer(serializers.ModelSerializer):
     per_lastName = LastNameField(source='*', required=False)
     ageGroup = serializers.SerializerMethodField()
     family = PersonFamilySerializer(required=False)
-    tags = PersonTagSerializer(many=True)
+    tags = PersonTagSerializer(many=True, required=False)
 
     class Meta:
         model = Person
@@ -166,8 +165,21 @@ class PersonSerializer(serializers.ModelSerializer):
         if data.get('per_birthday') == None or data.get('per_birthday') == "":
             data_copy['per_birthday'] = None
 
+
+
+        # Can't update Many to Many
+        if data.get('tags'):
+            tags = data_copy.get('tags')
+            taglist = []
+            for tag in tags:
+                print(tag)
+                taglist.append(Tag.objects.filter(tag_id = tag['tag_id']).first() ) 
+
+
         validated =  super(PersonSerializer, self).to_internal_value(data_copy)
 
+        if data.get('tags'):
+            validated['tags'] = taglist
         return validated
 
     def reverseSchoolYear(self, schoolYear):
@@ -177,6 +189,13 @@ class PersonSerializer(serializers.ModelSerializer):
             return datetime.datetime.now().year - schoolYear
         
     def update(self, instance, validated_data):
+
+        # Handle Tags, since can't handle many to many
+        if(validated_data['tags']):
+            instance.tags.set([])
+            for tag in validated_data.pop('tags'):
+                instance.tags.add(tag)
+
         Person.objects.filter(id=instance.id).update(**validated_data)
         return instance
 
