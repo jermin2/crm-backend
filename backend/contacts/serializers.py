@@ -97,7 +97,7 @@ class FamilySerializer(serializers.ModelSerializer):
             for tag in tags:
                 taglist.append(Tag.objects.filter(tag_id = tag['tag_id']).first() ) 
 
-        validated =  super(PersonSerializer, self).to_internal_value(data_copy)
+        validated =  super(FamilySerializer, self).to_internal_value(data_copy)
 
         if data.get('tags'):
             validated['tags'] = taglist
@@ -194,7 +194,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
         # Can't update Many to Many
         if data.get('tags'):
-            tags = data_copy.get('tags')
+            tags = data_copy.pop('tags')
             taglist = []
             for tag in tags:
                 taglist.append(Tag.objects.filter(tag_id = tag['tag_id']).first() ) 
@@ -215,9 +215,11 @@ class PersonSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
 
         # Handle Tags, since can't handle many to many
-        if(validated_data['tags']):
+        if 'tags' in validated_data:
             instance.tags.set([])
-            for tag in validated_data.pop('tags'):
+            tags = validated_data.pop('tags')
+
+            for tag in tags:
                 instance.tags.add(tag)
 
         Person.objects.filter(id=instance.id).update(**validated_data)

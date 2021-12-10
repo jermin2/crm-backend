@@ -81,6 +81,25 @@ class PersonTagUpdateView(viewsets.ModelViewSet):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
 
+@api_view(['PUT', 'POST'])
+def contacts_tag(request):
+
+    if request.method == 'PUT':
+        ids = request.data['selectedIds']
+        tag = request.data['tag']
+        tag = Tag.objects.filter(tag_id = tag['tag_id']).first()
+        for id in ids:
+            contact = Person.objects.filter(id=id).first()
+            if not tag in contact.tags.all():
+                contact.tags.add(tag)
+
+    elif request.method == 'POST':
+        ids = request.data
+        people = Person.objects.filter(id__in=ids)
+        for person in people:
+            person.tags.set([])
+    
+    return JsonResponse({"data":"success"}, status=200)
 
 @api_view(['PUT','PATCH'])
 def update_person_tags(request, id):
