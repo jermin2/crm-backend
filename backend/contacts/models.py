@@ -84,7 +84,7 @@ class Person(models.Model):
     family = models.ForeignKey( 'Family', null=True, blank=True, on_delete=models.CASCADE, related_name="family_members" )
     per_avatar = models.CharField( max_length=255, default='', blank=True)
     per_notes = models.TextField(default='', blank=True)
-    tags = models.ManyToManyField(Tag, related_name="persons")
+    tags = models.ManyToManyField(Tag, blank=True, related_name="persons")
 
     def __str__(self):
         return self.per_lastName.upper() + " " + self.per_firstName 
@@ -97,6 +97,7 @@ class Family(models.Model):
     fam_familyName = models.CharField( max_length=255)
     fam_familyAddress = models.CharField( max_length=500, default='', blank=True)
     fam_familyEmail = models.EmailField(_('email address'), default='', blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, related_name="families")
 
     def __str__(self):
         return str(self.id) + "|" + self.fam_familyName.upper()

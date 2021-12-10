@@ -104,6 +104,27 @@ def update_person_tags(request, id):
 
     return JsonResponse({"data":message}, status=200)
 
+@api_view(['PUT','PATCH'])
+def update_family_tags(request, id):
+    # if request.user.is_anonymous:
+    #     print("anon")
+    #     return JsonResponse({"data":"anonymouse user"}, status=401)
+
+    family = Family.objects.filter(id = id).first()
+
+    tag_id = request.data['tag_id']
+
+    tagData = Tag.objects.filter(tag_id = tag_id).first()
+    message = ""
+    if family.tags.filter(tag_id = tag_id).exists():
+        family.tags.remove(tagData)
+        message = "Removed"
+    else:
+        family.tags.add(tagData)
+        message = "Added"
+    family.save()
+
+    return JsonResponse({"data":message}, status=200)
 
 # @authentication_classes([SessionAuthentication, BasicAuthentication])
 # @permission_classes([IsAuthenticated])

@@ -38,6 +38,7 @@ router.register('tag', views.TagView, 'tag-detail')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/contacts-app/updatetags/<id>', views.update_person_tags, name='update_person_tags'),
+    path('api/contacts-app/updatefamilytags/<id>', views.update_family_tags, name='update_family_tags'),
     path('api/contacts-app/', include(router.urls)),
     path(
         'api/auth/password/reset/confirm/<slug:uidb64>/<slug:token>/',

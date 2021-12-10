@@ -6,6 +6,21 @@ from .forms import MyCustomResetPasswordForm
 from rest_framework import generics
 import datetime
 
+class FilteredListSerializer(serializers.ListSerializer):
+
+    def to_representation(self, data):
+        user = self.context['request'].user
+        if user.is_anonymous: # TODO Return nothing if anonymouse
+            return super(FilteredListSerializer, self).to_representation(data)
+        data = data.filter(user=self.context['request'].user)
+        return super(FilteredListSerializer, self).to_representation(data)
+
+class PersonTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        list_serializer_class = FilteredListSerializer
+        fields = ['tag_id', 'color', 'description']
+
 class FamilyRoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = FamilyRole
@@ -46,13 +61,16 @@ class FamilyMembersSerializer(serializers.ModelSerializer):
         obj, created = Person.objects.update_or_create( id=person_id, defaults={**person_data})
         return obj
 
+
+
 class FamilySerializer(serializers.ModelSerializer):
     family_members = FamilyMembersSerializer( many=True, required=True)
     family_id = serializers.IntegerField(required=False)
+    tags = PersonTagSerializer(many=True, required=False)
     
     class Meta:
         model = Family
-        fields = ['fam_familyName','id', 'family_id',  'fam_familyEmail', 'fam_familyAddress', 'family_members']
+        fields = ['fam_familyName','id', 'family_id',  'fam_familyEmail', 'fam_familyAddress', 'family_members', 'tags']
 
     def update(self, instance, validated_data):
         family_members = validated_data.pop('family_members')
@@ -61,8 +79,29 @@ class FamilySerializer(serializers.ModelSerializer):
             person.family = instance
             person.save()
 
+        # Handle Tags, since can't handle many to many
+        if(validated_data['tags']):
+            instance.tags.set([])
+            for tag in validated_data.pop('tags'):
+                instance.tags.add(tag)
+
         Family.objects.filter(id=instance.id).update(**validated_data)
         return instance
+
+    def to_internal_value(self, data):
+        data_copy = data.copy()
+                # Can't update Many to Many
+        if data.get('tags'):
+            tags = data_copy.get('tags')
+            taglist = []
+            for tag in tags:
+                taglist.append(Tag.objects.filter(tag_id = tag['tag_id']).first() ) 
+
+        validated =  super(PersonSerializer, self).to_internal_value(data_copy)
+
+        if data.get('tags'):
+            validated['tags'] = taglist
+        return validated
 
 class LastNameField(serializers.Field):
     def to_representation(self, obj):
@@ -124,22 +163,10 @@ class UserTagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ['tag_id', 'color', 'description', 'user']
 
-class FilteredListSerializer(serializers.ListSerializer):
-
-    def to_representation(self, data):
-        user = self.context['request'].user
-        if user.is_anonymous: # TODO Return nothing if anonymouse
-            return super(FilteredListSerializer, self).to_representation(data)
-        data = data.filter(user=self.context['request'].user)
-        return super(FilteredListSerializer, self).to_representation(data)
 
 
-class PersonTagSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Tag
-        list_serializer_class = FilteredListSerializer
-        fields = ['tag_id', 'color', 'description']
+
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -165,14 +192,11 @@ class PersonSerializer(serializers.ModelSerializer):
         if data.get('per_birthday') == None or data.get('per_birthday') == "":
             data_copy['per_birthday'] = None
 
-
-
         # Can't update Many to Many
         if data.get('tags'):
             tags = data_copy.get('tags')
             taglist = []
             for tag in tags:
-                print(tag)
                 taglist.append(Tag.objects.filter(tag_id = tag['tag_id']).first() ) 
 
 
